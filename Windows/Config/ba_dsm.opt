@@ -1,0 +1,19 @@
+NodeName         NODENAME
+Passwordaccess	generate
+
+CommMethod       TCPIP
+TCPServerAddress SERVERADDRESS
+TCPPort          TCPPORTNO
+TCPClientAddress LOCALIPADDRESS
+TCPCADAddress	LOCALIPADDRESS
+HTTPPort	1581
+SSL Yes
+
+Managedservices Webclient Schedule
+
+ErrorLogRetention 14 D
+Errorlogname	"PATHTOERRORLOG"
+SchedLogRetention 14 D
+Schedlogname	"PATHTOSCHEDLOG"
+
+Domain All-Local

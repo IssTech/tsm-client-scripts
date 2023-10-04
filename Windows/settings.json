@@ -1,0 +1,57 @@
+{
+    "Version" : "0.1",
+    "InProduction" : "NO",
+    "Timestamp" : "2023/10/03",
+    "TSMServerSettings" : [
+        {
+            "tcpServerAddress" : "tsm.corp.com",
+            "tcpPort" : "1500",
+            "sslEncryption" : "No",
+            "sslPort" : "1543"
+        },
+        {
+            "ocAddress" : "oc.corp.com",
+            "ocHttpsPort" :  "11090"
+        }
+    ],
+    "NodeSettings" : [
+        {
+            "useOnlyHostname" : "No",
+            "nodeExtension" : "DOMAIN-",
+            "extensionBeforeAfter" : "Before",
+            "StatisNodeName": "StaticNodename",
+            "generatePassword" : "Yes",
+            "staticPassword" : "Passw0rdCl3rT3xt"
+        }
+    ],
+    "ClientServices" : [
+        {
+            "baCadService" : "TSM Client Acceptor",
+            "baSchedService" : "TSM Client Scheduler",
+            "baRemoteService" : "TSM Remote Client Agent"
+        }
+    ],
+    "ConfigurationFiles" : [
+        {
+            "optFilePath" : "Config",
+            "baDsmOpt" : "ba_dsm.opt",
+            "exchDsmOpt" : "exch_dsm.opt",
+            "sqlDsmOpt" : "sql_dsm.opt"
+        }
+    ],
+    "BaClientDownload" : [
+        {
+            "fileName" : "8.1.20.0-TIV-TSMBAC-WinX64.exe",
+            "description" : "IBM Spectrum Protect Backup-Archive Client for Windows",
+            "version" : "8.1.20.0",
+            "minimumOSLevel" : "Windows Server 2019",
+            "fileURL" : "https://www3.software.ibm.com/storage/tivoli-storage-management/maintenance/client/v8r1/Windows/x64/v8120/8.1.20.0-TIV-TSMBAC-WinX64.exe"
+        }
+    ],
+    "ProductNames" : [
+        {
+            "TSM": "IBM Spectrum Protect",
+            "BAC": "Backup-Archive Client"
+        }
+    ]
+}
