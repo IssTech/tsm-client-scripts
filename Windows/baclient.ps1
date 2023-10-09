@@ -232,13 +232,14 @@ Function Test-BaClient {
     $BaClientInstallPath = (Get-ItemProperty -Path "HKLM:\SOFTWARE\IBM\ADSM\CurrentVersion" -Name TSMClientPath).TSMClientPath
     $baclientdir = "$BaClientInstallPath" + "baclient"
     Set-Location "$BaClientdir"
+    $newNodePassword = Get-NodePassword
 
     $Argument = @(
             "set",
             "password",
             "$NodeName",
             "$NodePassword",
-            "$NodePassword"
+            "$newNodePassword"
             )
     Start-Process -FilePath "dsmc.exe" -ArgumentList "$Argument" -Wait
 }

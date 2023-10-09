@@ -4,8 +4,8 @@ Passwordaccess	generate
 CommMethod       TCPIP
 TCPServerAddress SERVERADDRESS
 TCPPort          TCPPORTNO
-TCPClientAddress LOCALIPADDRESS
-TCPCADAddress	LOCALIPADDRESS
+* TCPClientAddress LOCALIPADDRESS
+* TCPCADAddress	LOCALIPADDRESS
 HTTPPort	1581
 SSL Yes
 
