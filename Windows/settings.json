@@ -19,7 +19,7 @@
             "useOnlyHostname" : "No",
             "nodeExtension" : "DOMAIN-",
             "extensionBeforeAfter" : "Before",
-            "StatisNodeName": "StaticNodename",
+            "StaticNodeName": "StaticNodename",
             "generatePassword" : "Yes",
             "staticPassword" : "Passw0rdCl3rT3xt"
         }

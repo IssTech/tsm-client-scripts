@@ -129,15 +129,17 @@ Function Set-NodeSettings {
             $HostName = (Get-WmiObject Win32_OperatingSystem).CSName
             $TempNodeName = (Write-Output $NodeExtension | Foreach{ $_ + $HostName })
             $Global:NodeNameDefault = $TempNodeName
+            Write-Host "Using extension before hostname, Nodename: $NodeNameDefault"
         }
         elseif ($NodeSettings.extensionBeforeAfter -eq "After") {
             $HostName = (Get-WmiObject Win32_OperatingSystem).CSName
             $TempNodeName = (Write-Output $HostName | Foreach{ $_ + $NodeExtension })
             $Global:NodeNameDefault = $TempNodeName
+            Write-Host "Using extension after hostname, Nodename: $NodeNameDefault"
         }
         else {
             $Global:NodeNameDefault = $NodeSettings.StaticNodeName
-            Write-Host $NodeNameDefault
+            Write-Host "Using Static Nodename $NodeNameDefault"
         }
     }
 
@@ -146,6 +148,8 @@ Function Set-NodeSettings {
         $Global:NodePassword = (Get-NodePassword -length 24 -sourcedata $alphabet)
     }
     else {
+        alphabet=$NULL;For ($a=65;$a -le 90;$a++) {$alphabet+=,[char][byte]$a }
+        $Global:NewNodePassword = (Get-NodePassword -length 24 -sourcedata $alphabet)
         $Global:NodePassword = ($NodeSettings.staticPassword)
     }
 }
