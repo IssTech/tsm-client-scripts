@@ -42,7 +42,7 @@
     "BaClientDownload" : [
         {
             "fileName" : "8.1.20.0-TIV-TSMBAC-WinX64.exe",
-            "description" : "IBM Spectrum Protect Backup-Archive Client for Windows",
+            "description" : "IBM Storage Protect Backup-Archive Client for Windows",
             "version" : "8.1.20.0",
             "minimumOSLevel" : "Windows Server 2019",
             "fileURL" : "https://www3.software.ibm.com/storage/tivoli-storage-management/maintenance/client/v8r1/Windows/x64/v8120/8.1.20.0-TIV-TSMBAC-WinX64.exe"
@@ -50,7 +50,7 @@
     ],
     "ProductNames" : [
         {
-            "TSM": "IBM Spectrum Protect",
+            "TSM": "IBM Storage Protect",
             "BAC": "Backup-Archive Client"
         }
     ]
