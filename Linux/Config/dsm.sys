@@ -1,0 +1,19 @@
+Servername      SERVERNAME
+    NodeName         NODENAME
+    Passwordaccess	generate
+
+    CommMethod       TCPIP
+    TCPServerAddress SERVERADDRESS
+    TCPPort          TCPPORTNO
+    * TCPClientAddress LOCALIPADDRESS
+    * TCPCADAddress	LOCALIPADDRESS
+    SSL Yes
+
+    Managedservices Schedule
+
+    ErrorLogRetention 14 D
+    Errorlogname	"PATHTOERRORLOG"
+    SchedLogRetention 14 D
+    Schedlogname	"PATHTOSCHEDLOG"
+
+    Domain All-Local

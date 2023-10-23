@@ -10,6 +10,7 @@ __pycache__/
 .Python
 build/
 terraform/
+Linux/Download/
 develop-eggs/
 dist/
 downloads/

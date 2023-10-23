@@ -1,0 +1,50 @@
+{
+    "Version" : "0.1",
+    "InProduction" : "NO",
+    "Timestamp" : "2023/10/03",
+    "TSMServerSettings" : [
+        {
+            "servernameStanza" : "servername",
+            "tcpServerAddress" : "tsm.corp.com",
+            "tcpPort" : "1500",
+            "sslEncryption" : "No",
+            "sslPort" : "1543"
+        },
+        {
+            "ocAddress" : "oc.corp.com",
+            "ocHttpsPort" :  "11090"
+        }
+    ],
+    "NodeSettings" : [
+        {
+            "useOnlyHostname" : "Yes",
+            "extensionBeforeAfterStatic" : "After",
+            "nodeExtension" : "DOMAIN-",
+            "staticNodename": "StaticNodename",
+            "generatePassword" : "Yes",
+            "staticPassword" : "Passw0rdCl3rT3xt"
+        }
+    ],
+    "ClientServices" : [
+        {
+            "baCadService" : "dsmcad"
+        }
+    ],
+    "BaClientDownload" : [
+        {
+            "filename" : "8.1.20.0-TIV-TSMBAC-LinuxX86.tar",
+            "description" : "IBM Storage Protect Backup-Archive Client for RedHat",
+            "package" : "rpm",
+            "downloadDirectory" : "./Download/",
+            "version" : "8.1.20.0",
+            "minimumOSLevel" : "RedHat Enterprise Linux 8",
+            "fileURL" : "https://www3.software.ibm.com/storage/tivoli-storage-management/maintenance/client/v8r1/Linux/LinuxX86/BA/v8120/8.1.20.0-TIV-TSMBAC-LinuxX86.tar"
+        }
+    ],
+    "ProductNames" : [
+        {
+            "TSM": "IBM Storage Protect",
+            "BAC": "Backup-Archive Client"
+        }
+    ]
+}

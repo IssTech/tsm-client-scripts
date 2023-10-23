@@ -7,27 +7,27 @@ Function Get-BaClientExist {
         Write-Output "You have already a $TSM Client Installed version: $TSMClientExistVersion"
         Write-Output "Please uninstall the $TSM Client before continue and"
         Write-Output "delete the key HKLM:\SOFTWARE\IBM\ADSM\CurrentVersion\BackupClient"
-        $Global:InstallBaClient = $False
-        $Global:UpgradeBaClient = $True
-        $Global:ExitErrorMsg = "$TSM $BAC already exist, Upgrade is not supported yet"
-        $Global:ExitCode = "ISS9999E"
+        # $Global:InstallBaClient = $False
+        # $Global:UpgradeBaClient = $True
+        # $Global:ExitErrorMsg = "$TSM $BAC already exist, Upgrade is not supported yet"
+        # $Global:ExitCode = "ISS9999E"
 
         }
 
     else {
-        $Global:InstallBaClient = $True
-        $Global:UpgradeBaClient = $False
-        $Global:ExitCode = "0"
+        # $Global:InstallBaClient = $True
+        # $Global:UpgradeBaClient = $False
+        # $Global:ExitCode = "0"
         }
 
     Write-Output ""
 }
 
 Function Set-BaSetup-Default {
-    $Global:TcpServerAddress = $TcpServerAddressDefault
-    $Global:TcpPort = $TcpPortDefault
-    $Global:NodeName = $NodeNameDefault
-    Get-NetIPAddress |fl IPAddress
+    # $Global:TcpServerAddress = $TcpServerAddressDefault
+    # $Global:TcpPort = $TcpPortDefault
+    # $Global:NodeName = $NodeNameDefault
+    # Get-NetIPAddress |fl IPAddress
     Write-Output "*****************************************************************"
     Write-Output "***************** Please run following commands *****************"
     Write-Output "*****************       or run the WebUI        *****************"
