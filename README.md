@@ -117,3 +117,104 @@ Domain All-Local
 
 ## Linux
 The bash script installation is depending on the `jq` command to be able to run.
+The first version 0.1 has only support for each step manually and you need to configure the settings.json file. 
+
+Run `./install.sh -h` for help.
+
+### Configuration
+The settings file is a JSON file and the main part you should focus on is `tcpServerAddress` to make sure it is pointing to the correct IBM Storage Protect Server and `tcpPort` that is your backup TCP/IP port. (Default is 1500)
+The other part you should configure is the `NodeSettings`, as default are we using the Windows Hostname as nodename and the password is in clear text in this JSON File. But as default is the powershell script automatically changing password to a random 20 characters long new password.
+If you has been assigned a new Nodename that doesn't match the hostname, you can either set the `extensionBeforeAfter` parameter to `Static` to set a totally new nodename.
+
+```
+{
+    "Version" : "0.1",
+    "InProduction" : "NO",
+    "Timestamp" : "2023/10/03",
+    "TSMServerSettings" : [
+        {
+            "servernameStanza" : "servername",
+            "tcpServerAddress" : "tsm.corp.com",
+            "tcpPort" : "1500",
+            "sslEncryption" : "No",
+            "sslPort" : "1543"
+        },
+        {
+            "ocAddress" : "oc.corp.com",
+            "ocHttpsPort" :  "11090"
+        }
+    ],
+    "NodeSettings" : [
+        {
+            "useOnlyHostname" : "Yes",
+            "extensionBeforeAfterStatic" : "After",
+            "nodeExtension" : "DOMAIN-",
+            "staticNodename": "StaticNodename",
+            "generatePassword" : "Yes",
+            "staticPassword" : "Passw0rdCl3rT3xt"
+        }
+    ],
+    "ClientServices" : [
+        {
+            "baCadService" : "dsmcad"
+        }
+    ],
+    "BaClientDownload" : [
+        {
+            "filename" : "8.1.20.0-TIV-TSMBAC-LinuxX86.tar",
+            "description" : "IBM Storage Protect Backup-Archive Client for RedHat",
+            "package" : "rpm",
+            "downloadDirectory" : "./Download/",
+            "version" : "8.1.20.0",
+            "minimumOSLevel" : "RedHat Enterprise Linux 8",
+            "fileURL" : "https://www3.software.ibm.com/storage/tivoli-storage-management/maintenance/client/v8r1/Linux/LinuxX86/BA/v8120/8.1.20.0-TIV-TSMBAC-LinuxX86.tar"
+        }
+    ],
+    "ProductNames" : [
+        {
+            "TSM": "IBM Storage Protect",
+            "BAC": "Backup-Archive Client"
+        }
+    ]
+}
+```
+#### dsm.sys
+We are not really changing anything in the `dsm.sys` file accept following parameters 
+- NODENAME
+- SERVERADDRESS
+- TCPPORTNO
+- PATHTOERRORLOG
+- PATHTOSCHEDLOG
+
+Any other parameters will not be changed, or if you add anything this will not be modified by the powershell script.
+```
+NodeName         NODENAME
+Passwordaccess	generate
+
+CommMethod       TCPIP
+TCPServerAddress SERVERADDRESS
+TCPPort          TCPPORTNO
+* TCPClientAddress LOCALIPADDRESS
+* TCPCADAddress	LOCALIPADDRESS
+SSL Yes
+
+Managedservices Schedule
+
+ErrorLogRetention 14 D
+Errorlogname	"PATHTOERRORLOG"
+SchedLogRetention 14 D
+Schedlogname	"PATHTOSCHEDLOG"
+
+Domain All-Local
+```
+
+### Download IBM Storage Protect Backup-Archive Client
+From the output from the settings.json file do we get the URL and filename that we need to download.
+if you are runnig `./install -d` we will automatically download the latest tar file from IBM website to your local server under current directory under `./Download/`
+
+### Install Backup-Archive Client
+To install the Backup-Archive Client you can run `./install.sh -i` and the script will first automatically check if the client is downloaded or not, if not it will automatically download the client from IBM website and extract the tar file. 
+
+After that will it run `dnf` to install the Backup-Archive Client including the GSK-Kit and the IBM Storage Protect API.
+
+### Configuration of the client

@@ -6,21 +6,25 @@
 
 settingsFile='settings.json'
 
-
-
 ############################################################
 # Help                                                     #
 ############################################################
 get_help()
 {
+
    # Display Help
-   echo "This is a installation wrapper around $TSM $BAC."
+   echo "This is a installation wrapper around IBM Storage Protect Backup-Archive Client."
    echo
-   echo "Syntax: scriptTemplate [-g|h|v|V]"
+   echo "Syntax: $0 [-h|a|i|c|d|p|P|s]"
    echo "options:"
    echo "h     Print this Help."
    echo "a     Automatic Installation and Configuation using JSON File."
-   echo "i     Automatic Installation and manual configuration using defaults from JSON File."
+   echo "i     Download and Install IBM Storage Protect."
+   echo "c     Configure IBM Storage Protect Client."
+   echo "d     Download IBM Storage Protect from IBM Website."
+   echo "p     Print Configuration file (settings.json)."
+   echo "P     Configure the Node Password."
+   echo "s     Configure the IBM Storage Protect Schedule Services"
    echo
 }
 
@@ -89,12 +93,17 @@ get_configuration()
         local generatePassword=($(jq -r '.NodeSettings[0].generatePassword' $settingsFile))
         local staticPassword=($(jq -r '.NodeSettings[0].staticPassword' $settingsFile))
         if [[ ${generatePassword,,} = 'yes' ]]; then
-            newpassword=$(echo $RANDOM | md5sum | head -c 20; echo;)
-            oldpassword=$staticPassword
+            newPassword=$(echo $RANDOM | md5sum | head -c 20; echo;)
+            oldPassword=$staticPassword
         else 
-            newpassword=$staticPassword
-            oldpassword=$staticPassword
+            newPassword=$staticPassword
+            oldPassword=$staticPassword
         fi
+
+        # Set Other variables
+        installDirectory='/opt/tivoli/tsm/client/ba/bin'
+        dsmSchedLog='/var/log/dsmsched.log'
+        dsmErrorLog='/var/log/dsmerror.log'
 
     else
         echo -e "Cloudn't find $settingsFile file"
@@ -102,7 +111,7 @@ get_configuration()
 }
 
 ############################################################
-# Configure the backup-archive client                      #
+# Configure the bac/opt/tivoli/tsm/client/ba/bin/dsm.optkup-archive client                      #
 ############################################################
 configuration()
 {
@@ -111,9 +120,6 @@ configuration()
     if [[ ! -n $tcpServerAddress ]]; then
         get_configuration
     fi
-    local installDirectory='/opt/tivoli/tsm/client/ba/bin'
-    local dsmScheduleLog='/var/log/dsmsched.log'
-    local dsmErrorLog='/var/log/dsmerror.log'
 
     # Copy our dsm.sys and dsm.opt file to our BA Client
     if [[ ! -d $installDirectory ]]; then
@@ -131,16 +137,65 @@ configuration()
 
     # Configure dsm.sys and dsm.opt file
     ## Configuration TCP Settings to Storage Protect Server
-    sed -i "s/SERVERNAME/$servernameStanza/g" "$installDirectory/dsm.{opt,sys}"
+    echo Modify dsm.opt and dsm.sys
+    sed -i "s/SERVERNAME/$servernameStanza/g" "$installDirectory/dsm.opt"
+    sed -i "s/SERVERNAME/$servernameStanza/g" "$installDirectory/dsm.sys"
     sed -i "s/SERVERADDRESS/$tcpServerAddress/g" "$installDirectory/dsm.sys"
+
     sed -i "s/TCPPORTNO/$tcpPort/g" "$installDirectory/dsm.sys"
-    
+
     ## Configure Log Paths
-    sed -i "s/PATHTOSCHEDLOG/$dsmSchedLog/g" "$installDirectory/dsm.sys"
-    sed -i "s/PATHTOERRORLOG/$dsmErrorLog/g" "$installDirectory/dsm.sys"
+    sed -i "s#PATHTOSCHEDLOG#$dsmSchedLog#g" "$installDirectory/dsm.sys"
+    
+    sed -i "s#PATHTOERRORLOG#$dsmErrorLog#g" "$installDirectory/dsm.sys"
 
     ## Configure Nodename and Password Settings
     sed -i "s/NODENAME/$nodename/g" "$installDirectory/dsm.sys"
+
+}
+
+############################################################
+# Set Node Password                                        #
+############################################################
+set_password()
+{
+    # Get Default Configuration to be able to download IBM Storage Protect Backup-Archive Client
+    get_configuration
+    echo Configure Node Password
+    $installDirectory/dsmc set password $oldPassword $newPassword
+}
+
+############################################################
+# Configure and start TSM Schedule Services                #
+############################################################
+configure_services()
+{
+    # Get Default Configuration to be able to download IBM Storage Protect Backup-Archive Client
+    get_configuration
+    echo -e "Configure the IBM Storage Protect Schedule Services (dsmcad)"
+    echo -e "Running systemctl enable dsmcad --now"
+    systemctl enable dsmcad --now
+    
+    local counter=1
+    
+    if [ -f $dsmSchedLog ];
+     then
+        rm -rf $dsmSchedLog
+    fi
+    
+    while [ ! -f $dsmSchedLog ];
+        do
+            echo Waiting for $dsmSchedLog to be updated, sleep for another 10 seconds
+            sleep 10
+            (( counter++ ))
+
+            if [ $counter -gt 60 ];
+             then
+                cat $dsmErrorLog
+                echo -e "Problem to start Schedule service" > $dsmSchedLog
+            fi
+        done
+    tail -50 $dsmSchedLog
 
 }
 
@@ -161,10 +216,13 @@ install_client()
 
     # Check if the tar file has been extracted.
     if [[ ! -f $downloadDirectory/$tivsm ]]; then
+        cd $downloadDirectory
         echo -e "Installation tar file has been downloaded but we need to extract the TAR file."
-        tar xvf $downloadDirectory/$installFilename
+        tar xvf $installFilename
+        cd..
     fi
 
+    cd $downloadDirectory
     # Start installing Backup-Archive Client
     # Collect all Backup-Archive and API packages
     ba_rpm="./TIVsm-BA.x86_64.rpm ./TIVsm-API64.x86_64.rpm"
@@ -173,6 +231,7 @@ install_client()
         ba_rpm="$ba_rpm ./$gsk"
     done
     yum install -y $ba_rpm
+    cd ..
 }
 
 ############################################################
@@ -193,6 +252,24 @@ download_client()
 }
 
 ############################################################
+# Uninstall                                                #
+############################################################
+uninstall()
+{
+    
+    echo -e "Uninstall Schedule Service"
+    systemctl stop dsmcad 
+    systemctl disable dsmcad
+    
+    rpm -e TIVsm-BA-8.1.20-0.x86_64
+    rpm -e TIVsm-API64-8.1.20-0.x86_64
+
+    rm -rf /opt/tivoli
+
+}
+
+
+############################################################
 ############################################################
 # Main program                                             #
 ############################################################
@@ -204,13 +281,19 @@ download_client()
 # Process the input options. Add options as needed.        #
 ############################################################
 # Get the options
-while getopts ":hcpgdi" option; do
+while getopts ":hcpgdiPsau" option; do
    case $option in
         h) # display Help
             get_help
             exit;;
         p) # Print Configuration in JSON Format
             print_configuration
+            exit;;  
+        P) # Set Node Password
+            set_password
+            exit;;  
+        s) # Configure Schedule Services
+            configure_services
             exit;;  
         c) # Configure your system
             configuration
@@ -224,6 +307,17 @@ while getopts ":hcpgdi" option; do
             exit;;
         d) # Download IBM Storage Protect Backup-Archive Client
             download_client
+            exit;;
+
+        u) # Uninstall IBM Storage Protect Client
+            uninstall
+            exit;;
+
+        a) # Fully Automatic Installation and Configuration
+            install_client
+            configuration
+            set_password
+            configure_services
             exit;;
         \?) # Invalid Option
             echo "Error: Invalid option, please use $0 -h for help"
